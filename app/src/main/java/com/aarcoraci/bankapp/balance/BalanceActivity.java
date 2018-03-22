@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -36,13 +35,20 @@ import io.reactivex.schedulers.Schedulers;
 
 public class BalanceActivity extends AppCompatActivity {
 
+    private List<Transaction> transactionList = new ArrayList<>();
+
     // chart settings and data
     private LineChart balanceChart;
     private List<Entry> chartData = new ArrayList<>();
     LineDataSet lineDataSet;
 
+    // recycler view for the month selection
     private RecyclerView monthRecyclerView;
-    private BalanceMonthAdapter adapter;
+    private BalanceMonthAdapter balanceMonthAdapter;
+
+    // recycler view for list of transactions
+    private RecyclerView transactionRecyclerView;
+    private TransactionAdapter transactionAdapter;
 
     // display data
     float totalIncome = 0f;
@@ -72,12 +78,13 @@ public class BalanceActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+
         // scroll to current month
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         final int month = cal.get(Calendar.MONTH);
         monthRecyclerView.scrollToPosition(month);
-        adapter.selectPosition(month);
+        balanceMonthAdapter.selectPosition(month);
 
         // configure chart elements
         lineDataSet = new LineDataSet(chartData, "");
@@ -102,6 +109,19 @@ public class BalanceActivity extends AppCompatActivity {
     }
 
     private void setRecyclerView() {
+
+        // transaction recycler view
+        transactionRecyclerView = findViewById(R.id.transactionRecyclerView);
+        LinearLayoutManager transactionLayoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
+        transactionRecyclerView.setLayoutManager(transactionLayoutManager);
+
+        transactionAdapter = new TransactionAdapter(transactionList, currencyFormat, this);
+        transactionRecyclerView.setAdapter(transactionAdapter);
+
+
+        // month recycler view
         monthRecyclerView = findViewById(R.id.monthRecyclerView);
 
         LinearLayoutManager layoutManager
@@ -110,13 +130,13 @@ public class BalanceActivity extends AppCompatActivity {
         monthRecyclerView.setLayoutManager(layoutManager);
         DateFormatSymbols dfs = new DateFormatSymbols();
 
-        adapter = new BalanceMonthAdapter(dfs.getShortMonths(), new BalanceMonthAdapter.OnMonthClickListener() {
+        balanceMonthAdapter = new BalanceMonthAdapter(dfs.getShortMonths(), new BalanceMonthAdapter.OnMonthClickListener() {
             @Override
             public void onMonthClick(int position) {
                 drawChart(position);
             }
         }, this);
-        monthRecyclerView.setAdapter(adapter);
+        monthRecyclerView.setAdapter(balanceMonthAdapter);
 
     }
 
@@ -190,6 +210,7 @@ public class BalanceActivity extends AppCompatActivity {
                         totalIncome = 0f;
                         totalExpend = 0f;
                         chartData.clear();
+                        transactionList.clear();
                     }
 
                     @Override
@@ -199,6 +220,8 @@ public class BalanceActivity extends AppCompatActivity {
                         else
                             totalExpend -= transaction.amount;
 
+                        // store the transaction and the entry data object
+                        transactionList.add(transaction);
                         chartData.add(new Entry(transaction.date.getTime(), transaction.amount));
                     }
 
@@ -210,10 +233,14 @@ public class BalanceActivity extends AppCompatActivity {
                     @Override
                     public void onComplete() {
 
+                        // transactions
+                        transactionAdapter.notifyDataSetChanged();
+
+                        // chart
                         totalExpendTextView.setText(currencyFormat.format(totalExpend));
                         totalIncomeTextView.setText(currencyFormat.format(totalIncome));
                         balanceTextView.setText(currencyFormat.format(totalIncome - totalExpend));
-                        
+
                         lineDataSet.notifyDataSetChanged();
                         LineData lineData = new LineData((lineDataSet));
                         lineData.setDrawValues(false);
