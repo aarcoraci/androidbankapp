@@ -4,7 +4,7 @@
     <string name="my_bank">My Bank</string>
 
     <!-- login activity -->
-    <string name="login_touch_id">Login with Touch ID</string>
+    <string name="login_touch_id">Login with Touch Screen!</string>
     <string name="login_tap">Please tap to verify identity</string>
     <string name="protect_label">We protect your finances all safer</string>
 
