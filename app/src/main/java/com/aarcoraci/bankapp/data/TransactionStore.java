@@ -45,7 +45,7 @@ public class TransactionStore {
         Calendar calendar = Calendar.getInstance();
         Date currentDate = new Date();
 
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < 12; i++) {
             int totalTransactions = 6 + randomGenerator.nextInt(4);
             for (int j = 0; j < totalTransactions; j++) {
                 // transaction date
@@ -54,6 +54,7 @@ public class TransactionStore {
                 calendar.set(Calendar.DAY_OF_MONTH, 1 + randomGenerator.nextInt(28));
                 // some amount
                 float amount = 200 + randomGenerator.nextInt(500);
+                amount = randomGenerator.nextBoolean() ? amount : amount * 1;
 
                 // add element to data collection
                 transactionList.add(new Transaction(amount, calendar.getTime()));

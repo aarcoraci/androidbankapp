@@ -19,6 +19,12 @@ public class BalanceMonthAdapter extends RecyclerView.Adapter<BalanceMonthAdapte
     private int selectedIndex = RecyclerView.NO_POSITION;
     private int defaultTextColor = 0;
     private int selectedTextColor = 0;
+    private OnMonthClickListener onMonthClickListener;
+
+    // interactions
+    public interface OnMonthClickListener {
+        void onMonthClick(int position);
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -32,8 +38,10 @@ public class BalanceMonthAdapter extends RecyclerView.Adapter<BalanceMonthAdapte
                 @Override
                 public void onClick(View view) {
                     notifyItemChanged(selectedIndex);
-                    selectedIndex = getLayoutPosition();
+                    selectedIndex = getAdapterPosition();
                     notifyItemChanged(selectedIndex);
+
+                    onMonthClickListener.onMonthClick(selectedIndex);
                 }
             });
         }
@@ -43,8 +51,9 @@ public class BalanceMonthAdapter extends RecyclerView.Adapter<BalanceMonthAdapte
         }
     }
 
-    public BalanceMonthAdapter(String[] months, Context context) {
+    public BalanceMonthAdapter(String[] months, OnMonthClickListener onMonthClickListener, Context context) {
         this.months = months;
+        this.onMonthClickListener = onMonthClickListener;
         this.defaultTextColor = context.getResources().getColor(R.color.text_dark);
         this.selectedTextColor = context.getResources().getColor(R.color.teal);
     }

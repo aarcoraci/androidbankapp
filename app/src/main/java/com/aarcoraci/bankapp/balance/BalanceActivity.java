@@ -92,7 +92,12 @@ public class BalanceActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         DateFormatSymbols dfs = new DateFormatSymbols();
 
-        adapter = new BalanceMonthAdapter(dfs.getShortMonths(), this);
+        adapter = new BalanceMonthAdapter(dfs.getShortMonths(), new BalanceMonthAdapter.OnMonthClickListener() {
+            @Override
+            public void onMonthClick(int position) {
+                drawChart(position);
+            }
+        }, this);
         recyclerView.setAdapter(adapter);
 
     }
