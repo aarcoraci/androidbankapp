@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -36,11 +37,12 @@ import io.reactivex.schedulers.Schedulers;
 public class BalanceActivity extends AppCompatActivity {
 
     // chart settings and data
+    private final int CHART_ANIMATION_DURATION = 400;
     private LineChart balanceChart;
     private List<Entry> chartData = new ArrayList<>();
     LineDataSet lineDataSet;
 
-    private RecyclerView recyclerView;
+    private RecyclerView monthRecyclerView;
     private BalanceMonthAdapter adapter;
 
     // display data
@@ -48,7 +50,7 @@ public class BalanceActivity extends AppCompatActivity {
     float totalExpend = 0f;
 
     // ui
-    NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
+    private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
     private TextView balanceTextView;
     private TextView totalIncomeTextView;
     private TextView totalExpendTextView;
@@ -75,7 +77,7 @@ public class BalanceActivity extends AppCompatActivity {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         final int month = cal.get(Calendar.MONTH);
-        recyclerView.scrollToPosition(month);
+        monthRecyclerView.scrollToPosition(month);
         adapter.selectPosition(month);
 
         // configure chart elements
@@ -101,12 +103,12 @@ public class BalanceActivity extends AppCompatActivity {
     }
 
     private void setRecyclerView() {
-        recyclerView = findViewById(R.id.monthRecyclerView);
+        monthRecyclerView = findViewById(R.id.monthRecyclerView);
 
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
 
-        recyclerView.setLayoutManager(layoutManager);
+        monthRecyclerView.setLayoutManager(layoutManager);
         DateFormatSymbols dfs = new DateFormatSymbols();
 
         adapter = new BalanceMonthAdapter(dfs.getShortMonths(), new BalanceMonthAdapter.OnMonthClickListener() {
@@ -115,17 +117,23 @@ public class BalanceActivity extends AppCompatActivity {
                 drawChart(position);
             }
         }, this);
-        recyclerView.setAdapter(adapter);
+        monthRecyclerView.setAdapter(adapter);
 
     }
 
+    /**
+     * configures the chart and effects to match the design
+     */
     private void configureChartUI() {
+
         // general
         balanceChart.getDescription().setEnabled(false);
         balanceChart.setDrawBorders(false);
         balanceChart.setDrawGridBackground(false);
+
         // legend
         balanceChart.getLegend().setEnabled(false);
+
         // axis
         balanceChart.getXAxis().setEnabled(false);
         balanceChart.getAxisLeft().setEnabled(false);
@@ -187,7 +195,7 @@ public class BalanceActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(Transaction transaction) {
-                        if(transaction.amount > 0)
+                        if (transaction.amount > 0)
                             totalIncome += transaction.amount;
                         else
                             totalExpend -= transaction.amount;
@@ -207,12 +215,15 @@ public class BalanceActivity extends AppCompatActivity {
                         totalIncomeTextView.setText(currencyFormat.format(totalIncome));
                         balanceTextView.setText(currencyFormat.format(totalIncome - totalExpend));
 
+
                         lineDataSet.notifyDataSetChanged();
                         LineData lineData = new LineData((lineDataSet));
                         lineData.setDrawValues(false);
+                        lineData.setHighlightEnabled(false);
 
-                        balanceChart.invalidate();
                         balanceChart.setData(lineData);
+                        balanceChart.animateY(CHART_ANIMATION_DURATION);
+                        balanceChart.invalidate();
                     }
                 });
 
