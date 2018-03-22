@@ -9,16 +9,19 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.TextView;
 
 import com.aarcoraci.bankapp.R;
 import com.aarcoraci.bankapp.data.TransactionStore;
 import com.aarcoraci.bankapp.domain.Transaction;
+import com.aarcoraci.bankapp.utils.Utils;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
 import java.text.DateFormatSymbols;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,12 +43,26 @@ public class BalanceActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private BalanceMonthAdapter adapter;
 
+    // display data
+    float totalIncome = 0f;
+    float totalExpend = 0f;
+
+    // ui
+    NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
+    private TextView balanceTextView;
+    private TextView totalIncomeTextView;
+    private TextView totalExpendTextView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_balance);
 
         balanceChart = findViewById(R.id.balanceChart);
+        balanceTextView = findViewById(R.id.balanceTextView);
+        totalExpendTextView = findViewById(R.id.totalExpendTextView);
+        totalIncomeTextView = findViewById(R.id.totalIncomeTextView);
 
         setRecyclerView();
     }
@@ -115,15 +132,18 @@ public class BalanceActivity extends AppCompatActivity {
         balanceChart.getAxisRight().setEnabled(false);
 
         //margins and padding
-        balanceChart.setExtraOffsets(0, 15, 0, 15);
+        float offset = Utils.convertPixelsToDp(this.getResources().getDisplayMetrics(), 15);
+        balanceChart.setExtraOffsets(0, offset, 0, offset);
         balanceChart.setViewPortOffsets(0, 0, 0, 0);
 
         //extra effects
         int shadowColor = ContextCompat.getColor(BalanceActivity.this, R.color.green);
         int transparent = Color.argb(100, Color.red(shadowColor), Color.green(shadowColor), Color.blue(shadowColor));
 
+        float radius = Utils.convertPixelsToDp(this.getResources().getDisplayMetrics(), 30);
+        float dy = Utils.convertPixelsToDp(this.getResources().getDisplayMetrics(), 40);
         Paint paintShadow = balanceChart.getRenderer().getPaintRender();
-        paintShadow.setShadowLayer(20, 0, 15, transparent);
+        paintShadow.setShadowLayer(radius, 0, dy, transparent);
 
         Paint paint = balanceChart.getRenderer().getPaintRender();
         int height = balanceChart.getHeight();
@@ -143,6 +163,10 @@ public class BalanceActivity extends AppCompatActivity {
         TransactionStore.getInstance().getTransactions()
                 .subscribeOn(Schedulers.io())
                 .filter(new AppendOnlyLinkedArrayList.NonThrowingPredicate<Transaction>() {
+
+                    /**
+                     * Filter elements for the desired month
+                     */
                     Calendar calendar = Calendar.getInstance();
 
                     @Override
@@ -150,15 +174,24 @@ public class BalanceActivity extends AppCompatActivity {
                         calendar.setTime(transaction.date);
                         return calendar.get(Calendar.MONTH) == month;
                     }
-                }).observeOn(AndroidSchedulers.mainThread())
+                })
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Transaction>() {
                     @Override
                     public void onSubscribe(Disposable d) {
+                        // reset values
+                        totalIncome = 0f;
+                        totalExpend = 0f;
                         chartData.clear();
                     }
 
                     @Override
                     public void onNext(Transaction transaction) {
+                        if(transaction.amount > 0)
+                            totalIncome += transaction.amount;
+                        else
+                            totalExpend -= transaction.amount;
+
                         chartData.add(new Entry(transaction.date.getTime(), transaction.amount));
                     }
 
@@ -169,6 +202,10 @@ public class BalanceActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
+
+                        totalExpendTextView.setText(currencyFormat.format(totalExpend));
+                        totalIncomeTextView.setText(currencyFormat.format(totalIncome));
+                        balanceTextView.setText(currencyFormat.format(totalIncome - totalExpend));
 
                         lineDataSet.notifyDataSetChanged();
                         LineData lineData = new LineData((lineDataSet));

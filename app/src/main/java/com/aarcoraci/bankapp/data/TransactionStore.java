@@ -46,15 +46,17 @@ public class TransactionStore {
         Date currentDate = new Date();
 
         for (int i = 0; i < 12; i++) {
-            int totalTransactions = 6 + randomGenerator.nextInt(4);
-            for (int j = 0; j < totalTransactions; j++) {
+            int totalTransactions = 5 + randomGenerator.nextInt(4);
+            int daysBetweenTransactions = (30 / totalTransactions); // to create a smooth curve :)
+
+            for (int j = 1; j <= totalTransactions; j++) {
                 // transaction date
                 calendar.setTime(currentDate);  // init default year
                 calendar.set(Calendar.MONTH, i);
-                calendar.set(Calendar.DAY_OF_MONTH, 1 + randomGenerator.nextInt(28));
+                calendar.set(Calendar.DAY_OF_MONTH, j * daysBetweenTransactions);
                 // some amount
                 float amount = 200 + randomGenerator.nextInt(500);
-                amount = randomGenerator.nextBoolean() ? amount : amount * 1;
+                amount = randomGenerator.nextBoolean() ? amount : amount * -1;
 
                 // add element to data collection
                 transactionList.add(new Transaction(amount, calendar.getTime()));
@@ -63,23 +65,15 @@ public class TransactionStore {
         }
 
         // sort by date
-        Collections.sort(transactionList, new Comparator<Transaction>() {
-            @Override
-            public int compare(Transaction transaction, Transaction t1) {
-                return transaction.date.compareTo(t1.date);
-            }
-        });
+        Collections.sort(transactionList, (transaction, t1) -> transaction.date.compareTo(t1.date));
     }
 
     public Observable<Transaction> getTransactions() {
-        return Observable.create(new ObservableOnSubscribe<Transaction>() {
-            @Override
-            public void subscribe(ObservableEmitter<Transaction> emitter) throws Exception {
-                for (Transaction current : transactionList) {
-                    emitter.onNext(current);
-                }
-                emitter.onComplete();
+        return Observable.create(emitter -> {
+            for (Transaction current : transactionList) {
+                emitter.onNext(current);
             }
+            emitter.onComplete();
         });
     }
 }

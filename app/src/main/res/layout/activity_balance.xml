@@ -98,7 +98,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
         <TextView
-            android:id="@+id/textView12"
+            android:id="@+id/totalIncomeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -109,7 +109,7 @@
             app:layout_constraintStart_toEndOf="@+id/textView10" />
 
         <TextView
-            android:id="@+id/textView13"
+            android:id="@+id/totalExpendTextView"
             android:layout_width="wrap_content"
             android:layout_height="21dp"
             android:layout_marginStart="8dp"
