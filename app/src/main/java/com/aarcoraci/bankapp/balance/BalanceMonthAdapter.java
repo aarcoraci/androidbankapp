@@ -44,19 +44,19 @@ public class BalanceMonthAdapter extends RecyclerView.Adapter<BalanceMonthAdapte
             super(itemView);
             monthNameTextView = itemView.findViewById(R.id.month_name);
 
-            monthNameTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            monthNameTextView.setOnClickListener(view -> {
 
-                    if (!isEnabled)
-                        return;
+                if (!isEnabled)
+                    return;
 
-                    notifyItemChanged(selectedIndex);
-                    selectedIndex = getAdapterPosition();
-                    notifyItemChanged(selectedIndex);
+                if (selectedIndex == getAdapterPosition())
+                    return;
 
-                    onMonthClickListener.onMonthClick(selectedIndex);
-                }
+                notifyItemChanged(selectedIndex);
+                selectedIndex = getAdapterPosition();
+                notifyItemChanged(selectedIndex);
+
+                onMonthClickListener.onMonthClick(selectedIndex);
             });
         }
 

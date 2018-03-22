@@ -227,6 +227,8 @@ public class BalanceActivity extends AppCompatActivity {
                         transactionAdapter.setTotalIncome(totalIncome);
 
                         transactionAdapter.notifyDataSetChanged();
+                        transactionRecyclerView.scheduleLayoutAnimation();
+                        transactionRecyclerView.scrollToPosition(0);
 
                         // chart
                         balanceMonthAdapter.setEnabled(false);
