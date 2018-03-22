@@ -37,7 +37,6 @@ import io.reactivex.schedulers.Schedulers;
 public class BalanceActivity extends AppCompatActivity {
 
     // chart settings and data
-    private final int CHART_ANIMATION_DURATION = 400;
     private LineChart balanceChart;
     private List<Entry> chartData = new ArrayList<>();
     LineDataSet lineDataSet;
@@ -214,15 +213,13 @@ public class BalanceActivity extends AppCompatActivity {
                         totalExpendTextView.setText(currencyFormat.format(totalExpend));
                         totalIncomeTextView.setText(currencyFormat.format(totalIncome));
                         balanceTextView.setText(currencyFormat.format(totalIncome - totalExpend));
-
-
+                        
                         lineDataSet.notifyDataSetChanged();
                         LineData lineData = new LineData((lineDataSet));
                         lineData.setDrawValues(false);
                         lineData.setHighlightEnabled(false);
 
                         balanceChart.setData(lineData);
-                        balanceChart.animateY(CHART_ANIMATION_DURATION);
                         balanceChart.invalidate();
                     }
                 });

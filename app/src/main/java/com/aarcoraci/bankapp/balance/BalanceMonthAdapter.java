@@ -58,7 +58,7 @@ public class BalanceMonthAdapter extends RecyclerView.Adapter<BalanceMonthAdapte
         this.selectedTextColor = context.getResources().getColor(R.color.teal);
     }
 
-    public void selectPosition(int position){
+    public void selectPosition(int position) {
         notifyItemChanged(selectedIndex);
         selectedIndex = position;
         notifyItemChanged(selectedIndex);
