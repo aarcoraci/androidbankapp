@@ -12,4 +12,21 @@
     <string name="balance_label">Balance</string>
     <string name="income_label">Income</string>
     <string name="income_expend">Expend</string>
+
+    <!-- dummy incomes -->
+    <string-array name="incomes">
+        <item>Check deposited</item>
+        <item>Payment received</item>
+        <item>Investments</item>
+        <item>Gratuity</item>
+    </string-array>
+
+    <!-- dummy expends -->
+    <string-array name="expends">
+        <item>Rent</item>
+        <item>Payment done</item>
+        <item>Credit card payment</item>
+        <item>Gas</item>
+        <item>Groceries</item>
+    </string-array>
 </resources>

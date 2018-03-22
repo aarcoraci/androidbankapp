@@ -1,4 +1,4 @@
-package com.aarcoraci.bankapp;
+package com.aarcoraci.bankapp.login;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.aarcoraci.bankapp.R;
 import com.aarcoraci.bankapp.balance.BalanceActivity;
 
 /*

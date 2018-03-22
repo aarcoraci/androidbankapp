@@ -19,6 +19,22 @@ public class BalanceMonthAdapter extends RecyclerView.Adapter<BalanceMonthAdapte
     private int selectedIndex = RecyclerView.NO_POSITION;
     private int defaultTextColor = 0;
     private int selectedTextColor = 0;
+    private OnMonthClickListener onMonthClickListener;
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    private boolean isEnabled = true;
+
+    // interactions
+    public interface OnMonthClickListener {
+        void onMonthClick(int position);
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -28,13 +44,19 @@ public class BalanceMonthAdapter extends RecyclerView.Adapter<BalanceMonthAdapte
             super(itemView);
             monthNameTextView = itemView.findViewById(R.id.month_name);
 
-            monthNameTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    notifyItemChanged(selectedIndex);
-                    selectedIndex = getLayoutPosition();
-                    notifyItemChanged(selectedIndex);
-                }
+            monthNameTextView.setOnClickListener(view -> {
+
+                if (!isEnabled)
+                    return;
+
+                if (selectedIndex == getAdapterPosition())
+                    return;
+
+                notifyItemChanged(selectedIndex);
+                selectedIndex = getAdapterPosition();
+                notifyItemChanged(selectedIndex);
+
+                onMonthClickListener.onMonthClick(selectedIndex);
             });
         }
 
@@ -43,13 +65,14 @@ public class BalanceMonthAdapter extends RecyclerView.Adapter<BalanceMonthAdapte
         }
     }
 
-    public BalanceMonthAdapter(String[] months, Context context) {
+    public BalanceMonthAdapter(String[] months, OnMonthClickListener onMonthClickListener, Context context) {
         this.months = months;
+        this.onMonthClickListener = onMonthClickListener;
         this.defaultTextColor = context.getResources().getColor(R.color.text_dark);
         this.selectedTextColor = context.getResources().getColor(R.color.teal);
     }
 
-    public void selectPosition(int position){
+    public void selectPosition(int position) {
         notifyItemChanged(selectedIndex);
         selectedIndex = position;
         notifyItemChanged(selectedIndex);
