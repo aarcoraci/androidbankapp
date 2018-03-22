@@ -35,6 +35,10 @@ import io.reactivex.schedulers.Schedulers;
 
 public class BalanceActivity extends AppCompatActivity {
 
+    // animation related
+    private final int CHART_ANIMATION_DURATION = 390;
+
+    // holder for transactions
     private List<Transaction> transactionList = new ArrayList<>();
 
     // chart settings and data
@@ -72,12 +76,6 @@ public class BalanceActivity extends AppCompatActivity {
         totalIncomeTextView = findViewById(R.id.totalIncomeTextView);
 
         setRecyclerView();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
 
         // scroll to current month
         Calendar cal = Calendar.getInstance();
@@ -95,17 +93,13 @@ public class BalanceActivity extends AppCompatActivity {
         lineDataSet.setLineWidth(4f);
 
         // simulate data fetch, needed to get the height on the gradient shader
-        balanceChart.post(new Runnable() {
-            @Override
-            public void run() {
-                // configure chart look and feel
-                configureChartUI();
+        balanceChart.post(() -> {
+            // configure chart look and feel
+            configureChartUI();
 
-                // first time draw
-                drawChart(month);
-            }
+            // first time draw
+            drawChart(month);
         });
-
     }
 
     private void setRecyclerView() {
@@ -130,12 +124,7 @@ public class BalanceActivity extends AppCompatActivity {
         monthRecyclerView.setLayoutManager(layoutManager);
         DateFormatSymbols dfs = new DateFormatSymbols();
 
-        balanceMonthAdapter = new BalanceMonthAdapter(dfs.getShortMonths(), new BalanceMonthAdapter.OnMonthClickListener() {
-            @Override
-            public void onMonthClick(int position) {
-                drawChart(position);
-            }
-        }, this);
+        balanceMonthAdapter = new BalanceMonthAdapter(dfs.getShortMonths(), position -> drawChart(position), this);
         monthRecyclerView.setAdapter(balanceMonthAdapter);
 
     }
@@ -240,6 +229,11 @@ public class BalanceActivity extends AppCompatActivity {
                         transactionAdapter.notifyDataSetChanged();
 
                         // chart
+                        balanceMonthAdapter.setEnabled(false);
+                        balanceChart.animateY(CHART_ANIMATION_DURATION);
+                        // disable interactions while animation is running. Chart is not exposing the animator to attach events :(
+                        balanceChart.postDelayed(() -> balanceMonthAdapter.setEnabled(true), CHART_ANIMATION_DURATION);
+
                         totalExpendTextView.setText(currencyFormat.format(totalExpend));
                         totalIncomeTextView.setText(currencyFormat.format(totalIncome));
                         balanceTextView.setText(currencyFormat.format(totalIncome - totalExpend));

@@ -21,6 +21,16 @@ public class BalanceMonthAdapter extends RecyclerView.Adapter<BalanceMonthAdapte
     private int selectedTextColor = 0;
     private OnMonthClickListener onMonthClickListener;
 
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    private boolean isEnabled = true;
+
     // interactions
     public interface OnMonthClickListener {
         void onMonthClick(int position);
@@ -37,6 +47,10 @@ public class BalanceMonthAdapter extends RecyclerView.Adapter<BalanceMonthAdapte
             monthNameTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
+                    if (!isEnabled)
+                        return;
+
                     notifyItemChanged(selectedIndex);
                     selectedIndex = getAdapterPosition();
                     notifyItemChanged(selectedIndex);
