@@ -117,7 +117,7 @@ public class BalanceActivity extends AppCompatActivity {
 
         transactionRecyclerView.setLayoutManager(transactionLayoutManager);
 
-        transactionAdapter = new TransactionAdapter(transactionList, currencyFormat, this);
+        transactionAdapter = new TransactionAdapter(transactionList, currencyFormat, 0, 0, this);
         transactionRecyclerView.setAdapter(transactionAdapter);
 
 
@@ -234,6 +234,9 @@ public class BalanceActivity extends AppCompatActivity {
                     public void onComplete() {
 
                         // transactions
+                        transactionAdapter.setTotalExpend(totalExpend);
+                        transactionAdapter.setTotalIncome(totalIncome);
+
                         transactionAdapter.notifyDataSetChanged();
 
                         // chart
