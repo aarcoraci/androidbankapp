@@ -97,6 +97,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             holder.amountTextView.setTextColor(expendTextColor);
         }
 
+        holder.descriptionTextView.setText(transaction.details);
+
         // configure the chart
         holder.transactionPieChart.getLegend().setEnabled(false);
         holder.transactionPieChart.getDescription().setEnabled(false);

@@ -68,7 +68,11 @@ public class BalanceActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_balance);
+
+        // generate some dummy data
+        TransactionStore.getInstance().generateTransactionList(this);
 
         balanceChart = findViewById(R.id.balanceChart);
         balanceTextView = findViewById(R.id.balanceTextView);

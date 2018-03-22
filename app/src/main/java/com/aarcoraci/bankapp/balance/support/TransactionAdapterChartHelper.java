@@ -23,7 +23,7 @@ public abstract class TransactionAdapterChartHelper {
     public static PieData buildTransactionPieData(float transactionAmount, float total, int transactionColor, int totalColor){
         ArrayList<PieEntry> entries = new ArrayList<>();
         entries.add(new PieEntry(transactionAmount));
-        entries.add(new PieEntry(total));
+        entries.add(new PieEntry(total - transactionAmount));
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setDrawIcons(false);
