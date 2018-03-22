@@ -11,6 +11,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.aarcoraci.bankapp.R;
+import com.aarcoraci.bankapp.data.TransactionStore;
+import com.aarcoraci.bankapp.domain.Transaction;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -21,12 +23,19 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
+
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.internal.util.AppendOnlyLinkedArrayList;
+import io.reactivex.schedulers.Schedulers;
 
 public class BalanceActivity extends AppCompatActivity {
 
+    // chart settings and data
     private LineChart balanceChart;
     private List<Entry> chartData = new ArrayList<>();
+    LineDataSet lineDataSet;
 
     private RecyclerView recyclerView;
     private BalanceMonthAdapter adapter;
@@ -45,24 +54,36 @@ public class BalanceActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        // scroll to current month
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        final int month = cal.get(Calendar.MONTH);
+        recyclerView.scrollToPosition(month);
+        adapter.selectPosition(month);
+
+        // configure chart elements
+        lineDataSet = new LineDataSet(chartData, "");
+        lineDataSet.setColor(Color.RED);
+        lineDataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+        lineDataSet.setDrawValues(false);
+        lineDataSet.setDrawCircles(false);
+        lineDataSet.setLineWidth(4f);
 
         // simulate data fetch, needed to get the height on the gradient shader
         balanceChart.post(new Runnable() {
             @Override
             public void run() {
-                initChart();
+                // configure chart look and feel
+                configureChartUI();
+
+                // first time draw
+                drawChart(month);
             }
         });
 
-        // scroll to current month
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        int month = cal.get(Calendar.MONTH);
-        recyclerView.scrollToPosition(month);
-        adapter.selectPosition(month);
     }
 
-    private void setRecyclerView(){
+    private void setRecyclerView() {
         recyclerView = findViewById(R.id.monthRecyclerView);
 
         LinearLayoutManager layoutManager
@@ -76,25 +97,7 @@ public class BalanceActivity extends AppCompatActivity {
 
     }
 
-    private void initChart(){
-        // prepare chart data
-        chartData.clear();
-        Random r = new Random();
-
-        for (int i = 0; i < 11; i++) {
-            chartData.add(new Entry(i, r.nextInt(20)));
-        }
-
-        LineDataSet lineDataSet = new LineDataSet(chartData, "");
-        lineDataSet.setColor(Color.RED);
-        lineDataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
-        lineDataSet.setDrawValues(false);
-        lineDataSet.setDrawCircles(false);
-        lineDataSet.setLineWidth(4f);
-
-        LineData lineData = new LineData((lineDataSet));
-        lineData.setDrawValues(false);
-
+    private void configureChartUI() {
         // general
         balanceChart.getDescription().setEnabled(false);
         balanceChart.setDrawBorders(false);
@@ -124,10 +127,52 @@ public class BalanceActivity extends AppCompatActivity {
                 getResources().getColor(R.color.aqua),
                 Shader.TileMode.REPEAT);
         paint.setShader(linGrad);
-
-        balanceChart.invalidate();
-        balanceChart.setData(lineData);
     }
 
+    /***
+     * plots the transactions of a given month
+     * @param month month number
+     */
+    private void drawChart(final int month) {
 
+        TransactionStore.getInstance().getTransactions()
+                .subscribeOn(Schedulers.io())
+                .filter(new AppendOnlyLinkedArrayList.NonThrowingPredicate<Transaction>() {
+                    Calendar calendar = Calendar.getInstance();
+
+                    @Override
+                    public boolean test(Transaction transaction) {
+                        calendar.setTime(transaction.date);
+                        return calendar.get(Calendar.MONTH) == month;
+                    }
+                }).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Transaction>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        chartData.clear();
+                    }
+
+                    @Override
+                    public void onNext(Transaction transaction) {
+                        chartData.add(new Entry(transaction.date.getTime(), transaction.amount));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                        lineDataSet.notifyDataSetChanged();
+                        LineData lineData = new LineData((lineDataSet));
+                        lineData.setDrawValues(false);
+
+                        balanceChart.invalidate();
+                        balanceChart.setData(lineData);
+                    }
+                });
+
+    }
 }
