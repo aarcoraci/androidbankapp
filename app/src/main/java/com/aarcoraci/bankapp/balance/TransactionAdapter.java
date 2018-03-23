@@ -29,6 +29,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     private int expendTextColor = 0;
     private int lightChartColor = 0;
 
+    private int animationDuration = 0;
+
     public float getTotalIncome() {
         return totalIncome;
     }
@@ -72,6 +74,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         this.incomeTextColor = context.getResources().getColor(R.color.light_green);
         this.expendTextColor = context.getResources().getColor(R.color.teal);
         this.lightChartColor = context.getResources().getColor(R.color.grey);
+        this.animationDuration = context.getResources().getInteger(R.integer.chart_animation_duration);
         this.currencyFormat = currencyFormat;
     }
 
@@ -103,6 +106,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.transactionPieChart.getLegend().setEnabled(false);
         holder.transactionPieChart.getDescription().setEnabled(false);
         holder.transactionPieChart.setDrawEntryLabels(false);
+//        holder.transactionPieChart.animateX(animationDuration); // did not like how this looked
 
         // build the chart
         float total = transaction.amount > 0 ? totalIncome : totalExpend;
