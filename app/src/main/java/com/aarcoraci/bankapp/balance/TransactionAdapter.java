@@ -96,8 +96,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.amountTextView.setText(currencyFormat.format(transaction.amount));
         if (transaction.amount > 0) {
             holder.amountTextView.setTextColor(incomeTextColor);
+            holder.transactionImageView.setImageResource(R.drawable.transaction_in);
         } else {
             holder.amountTextView.setTextColor(expendTextColor);
+            holder.transactionImageView.setImageResource(R.drawable.transaction_out);
         }
 
         holder.descriptionTextView.setText(transaction.details);
