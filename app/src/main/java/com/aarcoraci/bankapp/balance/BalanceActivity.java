@@ -35,9 +35,6 @@ import io.reactivex.schedulers.Schedulers;
 
 public class BalanceActivity extends AppCompatActivity {
 
-    // animation related
-    private final int CHART_ANIMATION_DURATION = 390;
-
     // holder for transactions
     private List<Transaction> transactionList = new ArrayList<>();
 
@@ -236,9 +233,9 @@ public class BalanceActivity extends AppCompatActivity {
 
                         // chart
                         balanceMonthAdapter.setEnabled(false);
-                        balanceChart.animateY(CHART_ANIMATION_DURATION);
+                        balanceChart.animateY(getResources().getInteger(R.integer.chart_animation_duration));
                         // disable interactions while animation is running. Chart is not exposing the animator to attach events :(
-                        balanceChart.postDelayed(() -> balanceMonthAdapter.setEnabled(true), CHART_ANIMATION_DURATION);
+                        balanceChart.postDelayed(() -> balanceMonthAdapter.setEnabled(true), getResources().getInteger(R.integer.chart_animation_duration));
 
                         totalExpendTextView.setText(currencyFormat.format(totalExpend));
                         totalIncomeTextView.setText(currencyFormat.format(totalIncome));
