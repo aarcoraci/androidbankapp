@@ -1,4 +1,6 @@
 # BankApp
+download the built app from:
+[![](https://play.google.com/intl/en_gb/badges/images/generic/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.aarcoraci.bankapp)
 
 BankApp is a dummy app developed for fun and to share knoweledge on how technologies such as RxJava, RecyclerView animatins and other can be applied in a more real life scenario.
 
@@ -46,3 +48,5 @@ limitations under the License.
    [daria]: <https://dribbble.com/QDRT>
    [mpcharts]: <https://github.com/PhilJay/MPAndroidChart>
    [rx]: <https://github.com/ReactiveX/RxAndroid>
+
+
