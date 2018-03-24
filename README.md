@@ -1,6 +1,6 @@
 # BankApp
 
-BankApp is a dummy app developed for fun and to share knoweledge on how technologies such as RxJava, RecyclerView animatins and other can be applied in a more real life scenario.
+BankApp is a dummy app developed for fun and to share knoweledge on how technologies such as RxJava, RecyclerView animations and other can be applied in a more real life scenario.
 #### preview
 ![](https://lh3.googleusercontent.com/XR7wmomK6vE4o7IPRa6akgXYQBJcYcmge_knA_ILZe8ZeTG0B-2cE-2I4BMQ9sHJ0Q=w1536-h734)
 
